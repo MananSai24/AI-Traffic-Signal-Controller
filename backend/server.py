@@ -110,6 +110,21 @@ async def get_current_traffic():
         cycle_count=simulation_state["cycle_count"]
     )
 
+def generate_simple_explanation(direction: str, vehicle_count: int, vehicle_counts: dict) -> str:
+    """Generate a simple rule-based explanation"""
+    total_vehicles = sum(vehicle_counts.values())
+    percentage = (vehicle_count / total_vehicles * 100) if total_vehicles > 0 else 0
+    
+    explanations = [
+        f"{direction.capitalize()} has {percentage:.0f}% of total traffic ({vehicle_count}/{total_vehicles} vehicles). Prioritizing to reduce congestion.",
+        f"Highest queue detected on {direction} approach with {vehicle_count} waiting vehicles. Green signal allocated for optimal flow.",
+        f"{direction.capitalize()} route shows peak demand ({vehicle_count} vehicles). AI prioritizes to minimize overall wait time.",
+        f"Traffic analysis: {direction} requires immediate attention with {vehicle_count} vehicles vs {min(vehicle_counts.values())} minimum. Balancing flow.",
+        f"Congestion level critical on {direction} ({vehicle_count} vehicles). Smart signal extends green phase to clear backlog efficiently."
+    ]
+    
+    return random.choice(explanations)
+
 @api_router.post("/traffic/update")
 async def update_traffic():
     """Simulate new vehicle counts and determine signal states"""
@@ -139,8 +154,8 @@ async def update_traffic():
     simulation_state["current_green"] = max_direction
     simulation_state["cycle_count"] += 1
     
-    # Generate AI explanation
-    explanation = await generate_ai_explanation(max_direction, max_count, vehicle_counts)
+    # Generate simple rule-based explanation (fast)
+    explanation = generate_simple_explanation(max_direction, max_count, vehicle_counts)
     
     # Store insight (keep last 10)
     insight = {
