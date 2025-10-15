@@ -94,29 +94,24 @@ const TrafficDashboard = () => {
   useEffect(() => {
     fetchTrafficData();
     fetchInsights();
-    // Start first cycle immediately
-    setTimeout(() => {
+    
+    // Start simulation with first update after 2 seconds
+    const initialTimer = setTimeout(() => {
       updateTraffic();
     }, 2000);
-  }, []);
-
-  useEffect(() => {
-    if (!isPaused && !isManual) {
-      intervalRef.current = setInterval(() => {
-        updateTraffic();
-      }, 5000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
-
+    
+    // Set up recurring interval
+    const interval = setInterval(() => {
+      updateTraffic();
+    }, 5000);
+    
+    intervalRef.current = interval;
+    
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      clearTimeout(initialTimer);
+      clearInterval(interval);
     };
-  }, [isPaused, isManual]);
+  }, []);
 
   const togglePause = async () => {
     try {
