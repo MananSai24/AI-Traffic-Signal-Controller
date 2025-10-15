@@ -94,6 +94,10 @@ const TrafficDashboard = () => {
   useEffect(() => {
     fetchTrafficData();
     fetchInsights();
+    // Start first cycle immediately
+    setTimeout(() => {
+      updateTraffic();
+    }, 2000);
   }, []);
 
   useEffect(() => {
