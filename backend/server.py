@@ -73,16 +73,16 @@ class ExplanationRequest(BaseModel):
     vehicle_count: int
     all_counts: dict
 
-# Generate AI explanation using GPT-5
+# Generate AI explanation using GPT-5  
 async def generate_ai_explanation(direction: str, vehicle_count: int, all_counts: dict) -> str:
     try:
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id="traffic-controller",
-            system_message="You are an AI traffic management system. Provide clear, concise explanations for traffic signal decisions. Keep responses under 25 words."
-        ).with_model("openai", "gpt-5")
+            system_message="You are an AI traffic management system. Provide clear, concise explanations for traffic signal decisions. Keep responses under 20 words."
+        ).with_model("openai", "gpt-4o")
         
-        prompt = f"Traffic detected: North={all_counts['north']}, South={all_counts['south']}, East={all_counts['east']}, West={all_counts['west']} vehicles. The {direction} road has the highest congestion with {vehicle_count} vehicles. Explain why you're prioritizing this direction."
+        prompt = f"Traffic: N={all_counts['north']}, S={all_counts['south']}, E={all_counts['east']}, W={all_counts['west']}. Prioritizing {direction} ({vehicle_count}). Brief reason:"
         
         user_message = UserMessage(text=prompt)
         response = await chat.send_message(user_message)
@@ -90,7 +90,7 @@ async def generate_ai_explanation(direction: str, vehicle_count: int, all_counts
         return response
     except Exception as e:
         logging.error(f"Error generating AI explanation: {e}")
-        return f"Prioritizing {direction} road with {vehicle_count} vehicles due to highest congestion."
+        return f"Prioritizing {direction} with {vehicle_count} vehicles - highest congestion detected."
 
 @api_router.get("/")
 async def root():
