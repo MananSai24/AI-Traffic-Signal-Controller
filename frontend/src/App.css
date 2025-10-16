@@ -305,6 +305,9 @@ body {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 20;
+  pointer-events: auto;
 }
 
 .manual-btn:hover {
